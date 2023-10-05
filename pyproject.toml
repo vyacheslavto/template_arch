@@ -1,0 +1,118 @@
+[tool.poetry]
+name = "template_service"
+version = "0.1.1"
+description = "Шаблонный проект для разрабатываемых веб сервисов"
+authors = ["donteatme"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+asyncpg = "0.28.0"
+fastapi = { extras = ["all"], version = "0.100.0" }
+uvicorn = { extras = ["standard"], version = "0.23.1" }
+sqlalchemy = "2.0.19"
+alembic = "1.11.1"
+orjson = "3.9.2"
+loguru = "0.7.0"
+confluent-kafka = "2.2.0"
+pydantic-settings = "2.0.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "7.4.0"
+mypy = "1.4.1"
+pre-commit = "3.3.3"
+pytest-asyncio = "0.21.1"
+pytest-alembic = "0.10.6"
+pytest-cov = "4.1.0"
+ruff = "0.0.278"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[mypy]
+python_version = 3.11
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "serial",
+]
+
+
+[tool.ruff]
+# https://beta.ruff.rs/docs/rules/
+select = [
+    "E", # PyCodeStyle errors
+    "W", # PyCodeStyle warnings
+    "I", # isort
+    "N", # pep8-naming
+    "F", # Pyflakes
+    "UP", # pyupgrade
+    "T20", # flake8-print
+    "SIM", # flake8-simplify
+    "B", # flake8-bugbear
+    "ASYNC", # flake8-asynс
+    "G", # flake8-logging-format
+    "RUF", # Ruff-specific rules
+    "DTZ", # flake8-datetimez раскоментить после рефакторинг
+    "D" # - докстринги - самый душный линтер
+]
+ignore = [
+    "RUF001", # String contains ambiguous
+    "D100",
+    "D101",
+    "D104",
+    "D105",
+    "D106", # D106 Missing docstring in public nested class
+    "N805",
+    "B008", # B008 Do not perform function call `Depends` in argument defaults
+    "D107" # Missing docstring in `__init__`
+]
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "cli.example",
+    "app/tests",
+    "migrations"
+]
+per-file-ignores = { }
+
+# Same as Black.
+line-length = 88
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Assume Python 3.11.
+target-version = "py311"
+
+[tool.ruff.isort]
+combine-as-imports = false
+force-single-line = true
+
+[tool.ruff.pydocstyle]
+# Use Google-style docstrings.
+convention = "google"

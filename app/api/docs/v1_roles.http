@@ -1,0 +1,21 @@
+### Получение всех ролей
+
+GET {{host}}/roles
+Accept: application/json
+
+### Получение роли по айди
+
+GET {{host}}/roles/1
+Accept: application/json
+
+
+### Создание роли
+POST {{host}}/roles/
+Content-Type: application/json
+
+{
+  "role_name": "{{$random.alphabetic(10)}}"
+}
+
+
+

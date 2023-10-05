@@ -1,0 +1,30 @@
+### Получение всех пользователей
+
+GET {{host}}/users
+Accept: application/json
+
+### Получение пользователя по айди
+
+GET {{host}}/users/2
+Accept: application/json
+
+
+### Создание пользователя
+POST {{host}}/users/
+Content-Type: application/json
+
+{
+  "user_name": "{{$random.alphabetic(10)}}",
+  "role_id": "1"
+}
+
+### Удаление пользователя
+DELETE {{host}}/users/7
+Content-Type: application/json
+
+
+
+
+
+
+

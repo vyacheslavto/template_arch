@@ -1,0 +1,90 @@
+services:
+
+  template_service:
+    # Данный сервис будет собираться по умолчанию с любым профилем 
+    container_name: template_service
+    build:
+      context: .
+      target: development-image # Устанавливаем dev зависимости
+    ports:
+      - 3000:3000
+    volumes:
+      - ./app:/app/app # hot reload в докере
+    env_file:
+      - .env
+
+  postgresql_local:
+    image: "postgres:15.1"
+    container_name: postgresql_local
+    profiles: [ "all", "postgres", "stack" ]
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_volume_local:/data/pgdata
+    environment:
+      POSTGRES_PASSWORD: example
+
+  zookeeper_local:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper_local
+    profiles: [ "all", "kafka", "stack"]
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka_local:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka_local
+    profiles: [ "all", "kafka", "stack"]
+    ports:
+      - 19092:19092
+    depends_on:
+      - zookeeper_local
+    healthcheck:
+      test: nc -z localhost 9092 || exit -1
+      start_period: 15s
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper_local:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONNECTIONS_FROM_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka_local:9092,CONNECTIONS_FROM_HOST://localhost:19092
+      KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=ERROR,kafka.request.logger=ERROR,kafka.controller.KafkaController.logger=ERROR"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      
+  kafka_ui_local:
+    container_name: kafka_ui_local
+    image: provectuslabs/kafka-ui:latest
+    profiles: [ "all", "kafka", "stack"]
+    ports:
+      - 8080:8080
+    depends_on:
+      - zookeeper_local
+      - kafka_local
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka_local:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper_local:2181
+      KAFKA_CLUSTERS_0_JMXPORT: 9997
+
+  # Монго в данном проекте не используется, приведен для примера
+  mongodb_local:
+    image: mongo
+    container_name: mongodb_local
+    profiles: [ "all", "mongodb", "stack" ]
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+volumes:
+  postgres_volume_local:
+
+  
+
